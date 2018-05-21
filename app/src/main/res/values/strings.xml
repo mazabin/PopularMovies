@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="API_KEY"> </string>
-    <string name="popularity_descending">popularity.desc</string>
-    <string name="rating_descending">vote_average.desc</string>
-    <string name="query_part_1">https://api.themoviedb.org/3/discover/movie?api_key=</string>
-    <string name="query_part_2">&amp;language=en-US&amp;sort_by=</string>
+    <string name="by_popularity">popularity</string>
+    <string name="by_rating">top_rated</string>
+    <string name="query_part_1">https://api.themoviedb.org/3/movie/</string>
+    <string name="query_part_2">page=1&amp;language=en-US&amp;api_key=</string>
     <string name="query_part_3">&amp;include_adult=false&amp;include_video=false&amp;page=</string>
 </resources>

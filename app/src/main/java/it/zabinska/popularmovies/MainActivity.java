@@ -3,8 +3,13 @@ package it.zabinska.popularmovies;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
+
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,14 +23,16 @@ public class MainActivity extends AppCompatActivity {
 
     static int pageNumber = -1;
     static int sorting = 1;
+    static String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        GridView gridView = findViewById(R.id.grid_view);
-        gridView.setAdapter(new ImageAdapter(this));
+//        GridView gridView = findViewById(R.id.grid_view);
+ //       gridView.setAdapter(new ImageAdapter(this));
         pageNumber = 1; //PAGEVIEW
+        url = createUrl();
         FetchData f = new FetchData();
         f.execute();
 
@@ -34,25 +41,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
             try {
-                URL url = createUrl();
+                OkHttpClient client = new OkHttpClient();
 
-                assert url != null;
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(line).append("\n");
-                    }
-                    bufferedReader.close();
-                    return stringBuilder.toString();
-                }
-                finally{
-                    urlConnection.disconnect();
-                }
-            }
-            catch(Exception e) {
+                MediaType mediaType = MediaType.parse("application/octet-stream");
+                RequestBody body = RequestBody.create(mediaType, "{}");
+                Request request = new Request.Builder()
+                        .url(url)
+                        .get()
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                return response.toString();
+            } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
@@ -63,22 +63,27 @@ public class MainActivity extends AppCompatActivity {
             if(response == null) {
                 response = "THERE WAS AN ERROR";
             }
+            else response = "EVERYTHING WENT WELL";
             System.out.println(response);
         }
     }
 
-    static private URL createUrl() {
+    public String createUrl() {
 
         /** Please, remember to put your own the Movie Database API Key in res/values/strings.xml **/
 
-        String apiURL = sorting == 1 ? (R.string.query_part_1 + R.string.API_KEY + R.string.query_part_2 + R.string.popularity_descending + R.string.query_part_3 + String.valueOf(pageNumber)) : (R.string.query_part_1 + R.string.api_key + R.string.query_part_2 + R.string.rating_descending + R.string.query_part_3 + String.valueOf(pageNumber));
-        try {
-            return new URL(apiURL);
-        }
-        catch(MalformedURLException m){
-            m.printStackTrace();
-            return null;
-        }
+        String apiURL = getResources().getString(R.string.query_part_1);
+        StringBuilder apiURLBuilder = new StringBuilder(apiURL);
+        if(sorting == 1)
+            apiURLBuilder.append(getResources().getString(R.string.by_popularity));
+        else
+            apiURLBuilder.append(getResources().getString(R.string.by_rating));
+        apiURLBuilder.append("?");
+        apiURLBuilder.append(getResources().getString(R.string.query_part_2));
+        apiURLBuilder.append(getResources().getString(R.string.API_KEY));
+        apiURL = apiURLBuilder.toString();
+        return apiURL;
+
     }
 }
         //TODO (B) Create settings
