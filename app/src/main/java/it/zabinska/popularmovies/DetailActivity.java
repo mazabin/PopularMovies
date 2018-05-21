@@ -11,3 +11,6 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
     }
 }
+
+        //TODO (C.1) Initialize proper layout views for detailed information
+        //TODO (C.2) Create populateUi() method, that shows original title, poster thumbnail, plot (overview), rating(vote_average) and release date of the movie.
